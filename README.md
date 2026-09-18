@@ -2,6 +2,13 @@
 
 当前 `apex_racer.FCStd` 与 `print_in_place/apex_racer_side_down.stl` 已更新。
 
+## 车头贴床面积修订
+
+- 前轮前方的车身永久加宽，两侧延伸到与轮胎外侧面一致的平面，保留车鼻前端的收拢轮廓。
+- 按当前侧放方向，车头 X=80 至 100.5 mm 区域的平面贴床面积由 0 增至约 **260 mm²**；0.20 mm 首层的平均截面积约 **262 mm²**。这是车身自身的接触面积，不包括车轮，也无需拆除辅助片。
+- STL 和 3MF 最低点已校正到 Z=0。前后轮组仍分别为独立实体，最小转动间隙约 1 mm。
+- 本修订版尚未实物试打；切片时检查首层中车头前角的连续实心区域，并保持模型的侧放朝向。
+
 ## 结构
 
 整车在同一次打印任务中成型，只含 **3个互不粘连的实体**：
@@ -14,7 +21,7 @@
 
 ## 车头造型改进
 
-- **连续曲面前鼻**：截去原来由多个尖锐小面拼接的车头，使用五组 B 样条截面重新放样，形成从前轮拱收拢到保险杠的连续圆润曲面。
+- **连续曲面前鼻**：车身使用十三组 B 样条截面统一放样，前轮前方保持较宽的保险杠侧面，车鼻最前端继续收拢。
 - **宽而低的引擎盖**：降低局部峰值并拉长前后过渡，机盖中央低于两侧翼子板肩线，比例更接近真实 GT 赛车。
 - **薄型大灯**：两侧灯腔缩短深度并统一在同一水平基准上，避免正面出现突兀的大洞。
 - **双层中央格栅**：前保险杠加入上下两级浅盲孔格栅，中间保留实体防撞梁造型。
@@ -37,11 +44,11 @@
 
 ## 一次打印
 
-只导入 **`print_in_place/apex_racer_side_down.stl`**。它已侧面朝下，轴线沿打印Z方向，包围盒约 **198×69×94 mm**。保持整体位置，不要拆开排列三个实体，也不要填补间隙。
+只导入 **`print_in_place/apex_racer_side_down.stl`**，或使用同模型的 `apex_racer.3mf`。它已侧面朝下，轴线沿打印Z方向，包围盒约 **199.6×57.0×94.0 mm**。保持整体位置，不要拆开排列三个实体，也不要填补间隙。
 
 可先关闭自动支撑进行逐层预览；本版已针对这一朝向处理主要悬空面。首件仍应检查局部桥接、材料冷却、平台附着和象脚情况，再决定是否需要少量局部支撑。轴孔活动间隙内不要生成支撑。必要时使用外侧窄brim增强附着，打印后清除。
 
-建议从0.4 mm喷嘴、0.16–0.20 mm层高、3圈壁、15–20%填充开始切片。轴径5.0 mm、中央孔径7.0 mm，径向名义间隙1.0 mm；轮拱半径19.5 mm、轮胎半径18 mm，间隙1.5 mm；锥面处最小几何间隙约0.99 mm。未实物试打，实际可转动性仍受打印机精度与挤出影响。
+建议从0.4 mm喷嘴、0.16–0.20 mm层高、3圈壁、15–20%填充开始切片。轴径9.0 mm、中央孔径11.0 mm，径向名义间隙1.0 mm；轮拱半径19.5 mm、轮胎半径18 mm，间隙1.5 mm；轮组最小几何间隙约1.0 mm。本修订版未实物试打，实际可转动性仍受打印机精度与挤出影响。
 
 ## 检查和文件
 
@@ -49,13 +56,36 @@
 
 - `apex_racer.FCStd`：完整3实体模型。
 - `apex_racer.step`：当前CAD装配。
-- `apex_racer_print_pack.zip`：当前单份STL和说明。
+- `apex_racer.3mf`：当前版本的标准 3MF，与 STL 保持相同打印朝向。
+- `print_in_place/`：当前 STL、打印说明、贴床预览和唯一一份验证报告。
 - `apex_racer_preview.png`：本次渲染；下方为剖去上半车身的机构示意，金色突出显示两根哑铃轮组，并非实际打印颜色或需要切除的结构。
+- `print_in_place/bed_contact_preview.png`：灰色为整车投影，绿色为车身首层接触区域，黄色为加宽车头的平面接触区域。
 - `print_in_place/validation_report.json`：封闭网格、有效实体、两根轴360°运动包络及打印方向悬空角度检查。
 - `scripts/build_print_in_place.py`：当前版本生成脚本。
 
 两根轴360°旋转包络与底盘无相交。角度检查排除贴平台面并计入三角化容差：轮组未发现超过45°的下悬面；车身主要悬空面均已处理，少量曲面交界的数值结果保留在报告中。这是几何检查，不等同于实物免支撑认证。
 
-旧 `stl/` 为15件分装版；`build_independent_wheels_v2.py` 为旧四独立轮版本，不用于本次打印。
+历史分装版、旧导出和一次性修改脚本已移出当前目录，可在 Git 历史中查找。
 
 本次尾翼支撑按迎风面更窄的纵向薄板布局设计，未进行CFD或风阻测试。较大的轮轴间隙也会增加轮组晃动量，需实物试打后定最终公差。
+
+## 从脚本重新生成
+
+当前模型由 `scripts/build_print_in_place.py` 生成，仍依赖 `scripts/build_racer.py` 中的基础几何函数和座舱形状。不要单独运行后者覆盖当前版本。
+
+已验证环境为 Windows、FreeCAD 1.0.2 及其自带 Python 3.11；渲染脚本还需要 NumPy、Pillow 和 Windows Arial 字体。以下命令在仓库根目录的 PowerShell 中运行，将 `$freecadBin` 改为实际安装路径。
+
+```powershell
+$freecadBin = 'D:\soft\FreeCAD 1.0\bin'
+& "$freecadBin\python.exe" scripts/build_print_in_place.py
+& "$freecadBin\FreeCADCmd.exe" scripts/export_current_3mf.py
+& "$freecadBin\python.exe" scripts/render_racer.py
+& "$freecadBin\python.exe" scripts/render_bed_contact.py
+Start-Process -FilePath "$freecadBin\freecad.exe" -ArgumentList ('"' + (Join-Path $PWD 'scripts\save_display.FCMacro') + '"') -WindowStyle Hidden -Wait
+& "$freecadBin\python.exe" scripts/package_print.py
+& "$freecadBin\python.exe" scripts/check_delivery.py
+```
+
+FreeCAD 宏负责保存颜色和视角。`package_print.py` 生成包含 STL、打印说明、验证报告和贴床预览的 `apex_racer_print_pack.zip`；该压缩包、渲染场景 JSON、FreeCAD 自动备份和 Python 缓存均不纳入 Git。
+
+直接使用仓库内已有模型时，可以仅运行 `check_delivery.py`；若本地存在打印压缩包，还会检查包内文件与当前打印文件完全一致。

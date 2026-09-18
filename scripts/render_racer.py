@@ -16,7 +16,8 @@ def rot(q):
 im=Image.new('RGB',(1800,1250),(228,232,237));d=ImageDraw.Draw(im)
 def font(n):return ImageFont.truetype('C:/Windows/Fonts/arial.ttf',n)
 d.text((65,40),'APEX  /  GT-01',font=font(54),fill=(28,37,49))
-d.text((68,108),('198 mm  |  ' if dumbbell else '200 mm  |  ')+('ONE PRINT / DUMBBELL AXLES' if dumbbell else 'ONE PRINT / ROTATING WHEELS' if pip else 'MULTIPART PRINTABLE RACER'),font=font(21),fill=(85,98,113))
+length_mm=json.loads((root/'print_in_place/validation_report.json').read_text())['print_bounds_mm'][0] if dumbbell else 200
+d.text((68,108),f'{length_mm:.1f} mm  |  '+('ONE PRINT / DUMBBELL AXLES' if dumbbell else 'ONE PRINT / ROTATING WHEELS' if pip else 'MULTIPART PRINTABLE RACER'),font=font(21),fill=(85,98,113))
 views=[(.75,.40,920,475,4600),(.75,.70,555,985,2700) if dumbbell else (.75,.48,555,1060,2400) if pip else (2.55,.38,565,1010,3500)]
 for index,(az,el,ox,oy,scale) in enumerate(views):
     viewscene=side_scene if index==1 else scene

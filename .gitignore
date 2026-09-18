@@ -1,0 +1,19 @@
+# Python and FreeCAD local state
+__pycache__/
+*.py[cod]
+*.FCBak
+*.FCStd[0-9]*
+.freecad_appdata/
+.freecad_local/
+
+# Regenerable render inputs, diagnostics, and print archive
+/scene.json
+/print_in_place/*_scene.json
+/build_report.json
+/validation_report.json
+/display_report.json
+/display_error.txt
+/freecad_preview.png
+/apex_racer_print_pack.zip
+*.log
+/*_log.txt

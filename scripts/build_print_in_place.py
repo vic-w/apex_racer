@@ -30,8 +30,9 @@ body_stations=[
     (-99,34,15,29,26),(-90,43,20,34,29),(-75,47,24,38,30),
     (-55,47,25,36,30),(-30,47,25,33,30),(0,47,25,33,31),
     (25,47,25,34,33),(45,47,25,36,34),(63,47,24,38,34),
-    (76,45,22,36,33),(86,40,20,32,30.5),(95,34,17,27,26.5),
-    (100.5,27,13,22.5,21.5),
+    # Oversize the cheeks before trimming to the +/-47 mm print planes.
+    (76,48,22,36,33),(86,48,20,32,30.5),(95,48,17,27,26.5),
+    (100.5,36,13,22.5,21.5),
 ]
 body_sections=[]
 for x,w,wall,crest,deck in body_stations:
@@ -45,7 +46,8 @@ shell_surface_report={'construction':'single longitudinal smooth loft',
                       'untrimmed_faces':len(body_shell.Faces),
                       'planar_underside_z_mm':5,
                       'separate_hood_or_nose_fusions':0}
-fixed=body_shell.common(box(-99,-47,5,199.5,94,69)).common(roof_limit(74))
+# Trim only the sides; coincident end caps make the widened loft boolean fragile.
+fixed=body_shell.common(box(-110,-47,0,220,94,80)).common(roof_limit(74))
 fixed=fixed.fuse(canopy).removeSplitter()
 
 # Front details share one horizontal datum so the fascia reads as a single
@@ -84,7 +86,7 @@ fixed = fixed.removeSplitter()
 assert fixed.isValid() and len(fixed.Solids)==1,('body',len(fixed.Solids))
 # Continuous bearing hole with 45-degree flares into the wheel wells.
 for x in (-63,63):
-    # 7 mm shaft with a 9 mm bore leaves 1 mm radial running clearance.
+    # The bore radius leaves 1 mm radial running clearance around the shaft.
     fixed=fixed.cut(cyl(BORE_RADIUS,110,(x,-55,18),(0,1,0)))
     for sign in (-1,1):
         axis=V(0,sign,0)
@@ -110,6 +112,20 @@ for sign in (-1,1):
     fixed=fixed.fuse(yz_prism(section,-85,16))
 fixed=fixed.fuse(wing).removeSplitter()
 assert fixed.isValid() and len(fixed.Solids)==1,('body',len(fixed.Solids))
+# Audit the stationary nose only; wheel contact must not mask a floating bumper.
+nose=fixed.common(box(80,-48,0,25,96,70))
+nose_bed_faces=[f for f in nose.Faces
+                if abs(f.BoundBox.YMin+TIRE_FACE)<1e-6
+                and abs(f.BoundBox.YMax+TIRE_FACE)<1e-6]
+nose_contact_area=sum(f.Area for f in nose_bed_faces)
+nose_first_layer=nose.common(box(80,-TIRE_FACE,0,25,.2,70))
+assert nose_contact_area>150,('nose_bed_contact_mm2',nose_contact_area)
+bed_contact_report={'body_region_x_mm':[80,100.5],
+                    'bed_plane_y_mm':-TIRE_FACE,
+                    'nose_planar_contact_mm2':nose_contact_area,
+                    'first_layer_height_mm':.2,
+                    'nose_first_layer_mean_area_mm2':nose_first_layer.Volume/.2,
+                    'permanent_widened_bumper':True}
 # Each wheel grows from a 45-degree conical hub; no separate cap or pin.
 hub=Part.makeCone(SHAFT_RADIUS,18,TIRE_START-HUB_START,V(0,0,HUB_START),V(0,0,1))
 wheel=hub.fuse(cyl(18,TIRE_FACE-1-TIRE_START,(0,0,TIRE_START)))
@@ -172,8 +188,9 @@ for name,s in parts:
 doc.recompute();doc.saveAs(str(ROOT/'apex_racer.FCStd'));Part.export(doc.Objects,str(ROOT/'apex_racer.step'))
 (ROOT/'scene.json').write_text(json.dumps(scene,separators=(',',':')))
 compound=Part.makeCompound([s for _,s in parts]);printshape=compound.copy()
-printshape.rotate(V(0,0,0),V(1,0,0),90);printshape.translate(V(0,0,-printshape.BoundBox.ZMin))
+printshape.rotate(V(0,0,0),V(1,0,0),90);printshape.translate(V(0,0,TIRE_FACE))
 mesh=MeshPart.meshFromShape(Shape=printshape,LinearDeflection=.025,AngularDeflection=.08,Relative=False)
+assert abs(mesh.BoundBox.ZMin)<1e-5,('print_bed_z_mm',mesh.BoundBox.ZMin)
 mesh.write(str(OUT/'apex_racer_side_down.stl'));assert mesh.isSolid()
 side={'meshes':{},'instances':[]}
 for name,s in parts:
@@ -190,7 +207,10 @@ for name,env in envelopes:
     assert vol<.01 and gap>.89,(name,vol,gap)
 assert not axles[0][1].BoundBox.intersect(axles[1][1].BoundBox)
 report['body_surfaces']=shell_surface_report
+report['bed_contact']=bed_contact_report
+report['print_bounds_mm']=[mesh.BoundBox.XLength,mesh.BoundBox.YLength,mesh.BoundBox.ZLength]
+report['print_bed_z_mm']=mesh.BoundBox.ZMin
 report['shaft_diameter_mm']=2*SHAFT_RADIUS
 report['bore_diameter_mm']=2*BORE_RADIUS
-for p in [OUT/'validation_report.json',ROOT/'validation_report.json',ROOT/'build_report.json']:p.write_text(json.dumps(report,indent=2))
+(OUT/'validation_report.json').write_text(json.dumps(report,indent=2))
 print(json.dumps(report,indent=2),flush=True)

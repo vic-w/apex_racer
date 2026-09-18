@@ -3,7 +3,7 @@ import json,traceback
 import FreeCAD as App
 import FreeCADGui as Gui
 from PySide import QtCore
-root=Path('D:/code/codex_ws/apex_racer')
+root=Path(__file__).resolve().parents[1]
 try:
     Gui.getMainWindow().hide()
     doc=App.openDocument(str(root/'apex_racer.FCStd'))
