@@ -1,0 +1,3 @@
+﻿from pathlib import Path
+p=Path('apex_racer/README.md');s=p.read_text(encoding='utf-8-sig').replace('尾翼支架改成三角斜撑；翼端板用斜面逐渐展开。','尾翼支撑为两片沿前后方向展开的薄平板，法向厚2 mm、前后长度16 mm，横向外倾45°以适应侧放逐层打印；翼端板仍用斜面逐渐展开。').replace('中央孔径6.2 mm，径向名义间隙0.6 mm；锥面处最小几何间隙约0.47 mm','中央孔径7.0 mm，径向名义间隙1.0 mm；轮拱半径19.5 mm、轮胎半径18 mm，间隙1.5 mm；锥面处最小几何间隙约0.99 mm');s += '\n本次尾翼支撑按迎风面更窄的纵向薄板布局设计，未进行CFD或风阻测试。较大的轮轴间隙也会增加轮组晃动量，需实物试打后定最终公差。\n';p.write_text(s,encoding='utf-8');p.with_name('print_in_place').joinpath('README.md').write_text(s,encoding='utf-8')
+p=Path('apex_racer/scripts/render_racer.py');s=p.read_text(encoding='utf-8').replace("'0.6 mm bearing clearance','45-degree tapered hubs'","'1.0 mm bearing / 1.5 mm arch','2 mm longitudinal wing plates'");p.write_text(s,encoding='utf-8')

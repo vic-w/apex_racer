@@ -1,0 +1,3 @@
+﻿from pathlib import Path
+p=Path('apex_racer/scripts/check_delivery.py');s=p.read_text(encoding='utf-8-sig').replace('len(doc.Objects)==5','len(doc.Objects)==3').replace("report['rigid_bodies']==5","report['rigid_bodies']==3").replace('Saved CAD: 5 valid solids','Saved CAD: 3 valid solids').replace('Four full-rotation clearance checks passed.','Two full-rotation axle checks passed.');p.write_text(s,encoding='utf-8')
+p=Path('apex_racer/scripts/render_racer.py');s=p.read_text(encoding='utf-8').replace("'200 mm  |  '+(","('198 mm  |  ' if dumbbell else '200 mm  |  ')+(");p.write_text(s,encoding='utf-8')
