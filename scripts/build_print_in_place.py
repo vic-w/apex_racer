@@ -3,6 +3,7 @@ import runpy,json,math
 import FreeCAD as A
 import Part,MeshPart
 from body_surface import make_body,rounded_planform,end_underside_cutters,check_fairness,check_corners,check_end_profiles
+from headlights import add_headlights,check_headlights
 from sports_coupe import MODEL_SCALE,ROOF_HEIGHT,make_cabin,make_wing,detail_body,face_groups,check_packaging,check_cabin_surface,check_fender_coverage,check_rear_transition
 ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'print_in_place'
 g=runpy.run_path(str(ROOT/'scripts/build_racer.py'))
@@ -26,17 +27,11 @@ fixed=body_shell.fuse(canopy).common(rounded_planform()).removeSplitter()
 fixed=fixed.cut(end_underside_cutters()).removeSplitter()
 assert fixed.isValid() and len(fixed.Solids)==1 and fixed.Volume>400000
 
-# Slim lamp strips and a single intake fit the lowered nose. End chamfers
-# close the recesses gradually in the side-down print direction.
+# The low intake remains below the bonnet-mounted swept headlights.
 def front_recess(points, x=95.5, depth=6.0):
     return yz_prism(points, x, depth)
 
 for sign in (-1, 1):
-    # Thin swept lamp pocket on the upper bumper.
-    lamp=[(sign*10.0,15.2),(sign*11.1,16.3),(sign*29.9,16.3),
-          (sign*31.0,15.2),(sign*29.9,14.1),(sign*11.1,14.1)]
-    fixed=fixed.cut(front_recess(lamp,96.5,4.5))
-
     # Diamond ducts close at 45 degrees in the side-down print direction.
     duct=[(sign*22.2,11.5),(sign*25.0,8.7),(sign*27.8,11.5),
           (sign*25.0,14.3)]
@@ -69,7 +64,8 @@ for sign in (-1,1):
     fixed=fixed.fuse(yz_prism(section,-90,12))
 fixed=fixed.fuse(wing).removeSplitter()
 fixed,glass_floors,detail_floors,body_details,pillars=detail_body(fixed,glazing_envelope)
-paint=face_groups(fixed,glass_floors,detail_floors)
+fixed,lamp_floors=add_headlights(fixed,body_shell)
+paint=face_groups(fixed,glass_floors,detail_floors,lamp_floors)
 packaging=check_packaging(fixed)
 assert fixed.isValid() and len(fixed.Solids)==1,('body',len(fixed.Solids))
 # Audit the stationary nose only; wheel contact must not mask a floating bumper.
@@ -163,6 +159,7 @@ print('Checking rear cabin transition',flush=True)
 rear_transition=check_rear_transition(fixed,MODEL_SCALE)
 corner_checks=check_corners(fixed,MODEL_SCALE)
 end_profiles=check_end_profiles(fixed,MODEL_SCALE)
+headlight_report=check_headlights(fixed,MODEL_SCALE)
 bed_contact_report={'body_region_x_mm':[80*MODEL_SCALE,100.5*MODEL_SCALE],
                     'bed_plane_y_mm':-TIRE_FACE_OUT,
                     'nose_planar_contact_mm2':nose_contact_area,
@@ -207,6 +204,8 @@ for name,s in parts:
         o.Label='Two-seat coupe body with fixed doors'
         o.addProperty('App::PropertyIntegerList','GlassFaces','Appearance').GlassFaces=paint['glass']
         o.addProperty('App::PropertyIntegerList','DetailFaces','Appearance').DetailFaces=paint['details']
+        o.addProperty('App::PropertyIntegerList','HeadlampBezelFaces','Appearance').HeadlampBezelFaces=paint['lamp_bezels']
+        o.addProperty('App::PropertyIntegerList','HeadlampLensFaces','Appearance').HeadlampLensFaces=paint['lamp_lenses']
         o.addProperty('App::PropertyString','CabinLayout','Design').CabinLayout='Two seats abreast; fixed doors; exterior model without interior fittings'
     m=mesh_entry(scene,name,s,(.72,.035,.055))
     area=0;total=0;regions=[];confirmed_area=0
@@ -229,10 +228,12 @@ for name,s in parts:
 # Colours identify the actual recessed CAD faces; the printable solid is unchanged.
 scene['instances']=[i for i in scene['instances'] if i['name']!='IntegratedBody']
 del scene['meshes']['IntegratedBody']
-accent=set(paint['glass']+paint['details'])
+accent={index for indices in paint.values() for index in indices}
 mesh_entry(scene,'BodyPaint',Part.makeCompound([f for i,f in enumerate(fixed.Faces) if i not in accent]),(.72,.035,.055),True)
 mesh_entry(scene,'GlassRecesses',Part.makeCompound([fixed.Faces[i] for i in paint['glass']]),(.075,.14,.18),True)
 mesh_entry(scene,'DoorDetails',Part.makeCompound([fixed.Faces[i] for i in paint['details']]),(.16,.025,.035),True)
+mesh_entry(scene,'HeadlampBezels',Part.makeCompound([fixed.Faces[i] for i in paint['lamp_bezels']]),(.035,.055,.07),True)
+mesh_entry(scene,'HeadlampLenses',Part.makeCompound([fixed.Faces[i] for i in paint['lamp_lenses']]),(.72,.85,.92),True)
 doc.recompute();doc.saveAs(str(ROOT/'apex_racer.FCStd'));Part.export(doc.Objects,str(ROOT/'apex_racer.step'))
 (ROOT/'scene.json').write_text(json.dumps(scene,separators=(',',':')))
 compound=Part.makeCompound([s for _,s in parts]);printshape=compound.copy()
@@ -283,6 +284,7 @@ report['fender_coverage']=fender_coverage
 report['body_surface_fairness']=surface_fairness
 report['rounded_corners']=corner_checks
 report['end_profiles']=end_profiles
+report['headlights']=headlight_report
 report['rear_cabin_transition']=rear_transition
 report['bed_contact']=bed_contact_report
 report['cabin']={'layout':'two-seat road coupe','roof_height_mm':ROOF_HEIGHT*MODEL_SCALE,

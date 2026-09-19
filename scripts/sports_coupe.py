@@ -166,11 +166,14 @@ def detail_body(body, glazing_envelope=None):
     return body, glass_floors, detail_floors, details, pillars
 
 
-def face_groups(body, glass_floors, detail_floors):
+def face_groups(body, glass_floors, detail_floors, extra_floors=None):
     print('Classifying recessed faces', flush=True)
     groups = {'glass': [], 'details': []}
     floor_groups = [('glass', [(floor, floor.BoundBox) for floor in glass_floors]),
                     ('details', [(floor, floor.BoundBox) for floor in detail_floors])]
+    for name, floors in (extra_floors or {}).items():
+        groups[name] = []
+        floor_groups.append((name, [(floor, floor.BoundBox) for floor in floors]))
     for index, face in enumerate(body.Faces):
         # The centre of mass of a ring-shaped groove lies outside the groove.
         # Sample its largest trimmed triangle, then project onto the CAD surface.
@@ -190,6 +193,7 @@ def face_groups(body, glass_floors, detail_floors):
                 break
     assert len(groups['glass']) >= 4, groups
     assert groups['details'], groups
+    assert all(groups[name] for name in (extra_floors or {})), groups
     return groups
 
 

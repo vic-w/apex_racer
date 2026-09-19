@@ -53,7 +53,7 @@ for index,(az,el,ox,oy,scale) in enumerate(views):
     im=Image.fromarray(pixels);d=ImageDraw.Draw(im)
 d.text((150,1170),'ENCLOSED WHEEL ARCHES  /  FIXED DOORS',font=font(22),fill=(82,96,111))
 d.text((1110,1170),'SMOOTH FASTBACK  /  REAR VIEW',font=font(22),fill=(82,96,111))
-d.text((65,1270),'ROUNDED CORNERS  /  TOP VIEW',font=font(25),fill=(82,96,111))
+d.text((65,1270),'SWEPT HEADLIGHTS  /  TOP VIEW',font=font(25),fill=(82,96,111))
 d.text((470,1780),'119.7 x 56.4 mm  /  CURVED BUMPER CORNERS',font=font(22),fill=(82,96,111))
 im.save(root/'apex_racer_preview.png')
 print('Preview saved')

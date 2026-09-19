@@ -56,9 +56,9 @@
   "overhang_audit": [
     {
       "part": "IntegratedBody",
-      "surface_area_mm2": 24610.63033979704,
-      "steeper_than_45_downward_area_mm2": 77.73740549429826,
-      "cad_confirmed_steeper_than_45_area_mm2": 74.58704029870826,
+      "surface_area_mm2": 24622.52060156528,
+      "steeper_than_45_downward_area_mm2": 85.31540959927483,
+      "cad_confirmed_steeper_than_45_area_mm2": 82.16504440368483,
       "largest_facets": [
         [
           -7.51,
@@ -368,6 +368,102 @@
       "terminal_thickness_mm": 6.218467037146658
     }
   },
+  "headlights": {
+    "count": 2,
+    "style": "outer-corner wraparound ribbon lenses",
+    "bezel_width_in_projection_mm": 0.54,
+    "bezel_recess_per_axis_mm": 0.39,
+    "lens_recess_per_axis_mm": 0.108,
+    "integral_with_body": true,
+    "checks": [
+      {
+        "side": "left",
+        "surface_areas_mm2": {
+          "top": 39.58227198489743,
+          "front": 2.4106027868875954,
+          "side": 2.972167767609639,
+          "rounded_corner": 24.907436930885062
+        },
+        "probes": [
+          {
+            "surface": "top",
+            "position_mm": [
+              55.69204837287912,
+              -24.20137651751214,
+              17.368268158907874
+            ]
+          },
+          {
+            "surface": "front",
+            "position_mm": [
+              60.19199999999999,
+              -12.545451345558371,
+              10.043805854690078
+            ]
+          },
+          {
+            "surface": "rounded_corner",
+            "position_mm": [
+              53.62571624530884,
+              -27.443689791989396,
+              17.93379908221989
+            ]
+          },
+          {
+            "surface": "side",
+            "position_mm": [
+              51.5887559425394,
+              -28.092,
+              18.729205987169184
+            ]
+          }
+        ]
+      },
+      {
+        "side": "right",
+        "surface_areas_mm2": {
+          "top": 39.5822739860382,
+          "front": 2.4106015629567294,
+          "side": 2.972167456102036,
+          "rounded_corner": 24.907429560852396
+        },
+        "probes": [
+          {
+            "surface": "top",
+            "position_mm": [
+              55.91666183152369,
+              23.799999648760654,
+              17.128330389828186
+            ]
+          },
+          {
+            "surface": "side",
+            "position_mm": [
+              51.58875594253925,
+              28.092,
+              18.72920598716917
+            ]
+          },
+          {
+            "surface": "rounded_corner",
+            "position_mm": [
+              53.820977944000454,
+              27.2376795773703,
+              18.46759821245007
+            ]
+          },
+          {
+            "surface": "front",
+            "position_mm": [
+              60.19199999999999,
+              12.545450648427066,
+              10.043805735978728
+            ]
+          }
+        ]
+      }
+    ]
+  },
   "rear_cabin_transition": {
     "sample_x_range_mm": [
       -46.8,
@@ -437,9 +533,9 @@
       60.3
     ],
     "bed_plane_y_mm": -28.2,
-    "nose_planar_contact_mm2": 83.94601108331167,
+    "nose_planar_contact_mm2": 76.25929576983548,
     "first_layer_height_mm": 0.2,
-    "nose_first_layer_mean_area_mm2": 85.63250722070575,
+    "nose_first_layer_mean_area_mm2": 78.8093916280999,
     "rear_body_planar_contact_mm2": 68.99305251712262,
     "rear_contact_region_x_mm": [
       -60.599999999999994,
@@ -584,7 +680,7 @@
   "bore_diameter_mm": 6.6,
   "slicing_check": {
     "slicer": "Bambu Studio 02.02.01.60",
-    "stl_sha256": "81ebf25168ff392ceeffc8792cd8233d7de97b1d82cbeba9d7e0b987eca080be",
+    "stl_sha256": "c02378437064922ddfdaebcbae5a2c04491a1a146a0382ca4ba9082a6d512419",
     "printer": "Bambu Lab A1 mini",
     "nozzle_diameter_mm": 0.4,
     "layer_height_mm": 0.2,
@@ -600,7 +696,7 @@
     "model_outside_build_volume": false,
     "mesh_repairs": [
       {
-        "face_count": "59974",
+        "face_count": "61536",
         "edges_fixed": "0",
         "degenerate_facets": "0",
         "facets_removed": "0",
@@ -608,8 +704,8 @@
         "backwards_edges": "0"
       }
     ],
-    "estimated_seconds": 8080,
-    "estimated_filament_g": 63.22,
+    "estimated_seconds": 8153,
+    "estimated_filament_g": 63.18,
     "limitation": "Successful slicing without support is not a physical print test."
   }
 }

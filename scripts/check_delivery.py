@@ -4,6 +4,7 @@ import FreeCAD as A
 import Mesh,Part,MeshPart
 from sports_coupe import MODEL_SCALE,check_packaging,check_cabin_surface,check_fender_coverage,check_rear_transition
 from body_surface import check_corners,check_fairness,check_end_profiles
+from headlights import check_headlights
 root=Path(__file__).resolve().parents[1]
 with zipfile.ZipFile(root/'apex_racer.FCStd') as z:assert 'GuiDocument.xml' in z.namelist()
 doc=A.openDocument(str(root/'apex_racer.FCStd'));assert len(doc.Objects)==3
@@ -24,6 +25,10 @@ if 'slicing_check' in report:
     assert slicing['stl_sha256']==hashlib.sha256((root/'print_in_place/apex_racer_side_down.stl').read_bytes()).hexdigest()
 assert all(r['conservative_envelope_overlap_mm3']<.01 for r in report['wheel_360_sweep_checks'])
 body=doc.getObject('IntegratedBody').Shape
+headlights=check_headlights(body,MODEL_SCALE)
+assert headlights['count']==report['headlights']['count']==2
+assert len(doc.getObject('IntegratedBody').HeadlampLensFaces)>=2
+assert len(doc.getObject('IntegratedBody').HeadlampBezelFaces)>=2
 corners=check_corners(body,MODEL_SCALE)
 assert len(corners['checks'])==4
 end_profiles=check_end_profiles(body,MODEL_SCALE)
@@ -108,6 +113,7 @@ print('Rear body contact near the wheel: {:.1f} mm2.'.format(rear_contact))
 print('Two occupant reference envelopes fit; both fixed door grooves are present in the saved CAD.')
 print('All four fenders cover the upper tire tread with clearance; rear cabin transition has no steep step.')
 print('Fair main skin: no extra longitudinal valleys. All four square bumper corners are removed.')
+print('Both swept headlights have real recessed bezels and integral curved lens faces.')
 print('Tapered end thickness: front {:.2f} mm; rear {:.2f} mm.'.format(
     end_profiles['front']['terminal_thickness_mm'],end_profiles['rear']['terminal_thickness_mm']))
 print('Roof: {:.1f} mm; rear wing: {:.1f} mm; wing bed contact: {:.1f} mm2.'.format(
