@@ -2,7 +2,8 @@ from pathlib import Path
 import hashlib,json,zipfile
 import FreeCAD as A
 import Mesh,Part,MeshPart
-from sports_coupe import MODEL_SCALE,check_packaging,check_cabin_surface
+from sports_coupe import MODEL_SCALE,check_packaging,check_cabin_surface,check_fender_coverage,check_rear_transition
+from body_surface import check_corners,check_fairness,check_end_profiles
 root=Path(__file__).resolve().parents[1]
 with zipfile.ZipFile(root/'apex_racer.FCStd') as z:assert 'GuiDocument.xml' in z.namelist()
 doc=A.openDocument(str(root/'apex_racer.FCStd'));assert len(doc.Objects)==3
@@ -23,6 +24,23 @@ if 'slicing_check' in report:
     assert slicing['stl_sha256']==hashlib.sha256((root/'print_in_place/apex_racer_side_down.stl').read_bytes()).hexdigest()
 assert all(r['conservative_envelope_overlap_mm3']<.01 for r in report['wheel_360_sweep_checks'])
 body=doc.getObject('IntegratedBody').Shape
+corners=check_corners(body,MODEL_SCALE)
+assert len(corners['checks'])==4
+end_profiles=check_end_profiles(body,MODEL_SCALE)
+for end in ('front','rear'):
+    assert abs(end_profiles[end]['terminal_thickness_mm']-
+               report['end_profiles'][end]['terminal_thickness_mm'])<.01
+saved_surface=next(face.Surface for face in body.Faces
+                   if isinstance(face.Surface,Part.BSplineSurface)
+                   and face.Surface.NbUPoles==11 and face.Surface.NbVPoles==9)
+fairness=check_fairness(saved_surface,MODEL_SCALE,MODEL_SCALE)
+assert abs(fairness['max_bonnet_to_fender_height_difference_mm']-
+           report['body_surface_fairness']['max_bonnet_to_fender_height_difference_mm'])<.01
+fenders=check_fender_coverage(body,MODEL_SCALE)
+rear_transition=check_rear_transition(body,MODEL_SCALE)
+assert len(fenders['checks'])==4
+for measured,recorded in zip(fenders['checks'],report['fender_coverage']['checks']):
+    assert abs(measured['min_sampled_shell_thickness_mm']-recorded['min_sampled_shell_thickness_mm'])<.01
 packaging=check_packaging(body,MODEL_SCALE)
 assert len(packaging['checks'])==2
 cabin=report['cabin']
@@ -33,8 +51,8 @@ assert abs(surface['upper_glazing_width_mm']-cabin['surface_measurements']['uppe
 assert abs(surface['side_window_sill_above_print_bed_mm']-cabin['surface_measurements']['side_window_sill_above_print_bed_mm'])<.01
 assert all(p['minimum_window_recess_separation_mm']>MODEL_SCALE for p in cabin['pillars'])
 assert abs(m.BoundBox.YLength-cabin['roof_height_mm'])<.1
-wing=body.common(Part.makeBox(35*MODEL_SCALE,96*MODEL_SCALE,14*MODEL_SCALE,
-                              A.Vector(-101*MODEL_SCALE,-48*MODEL_SCALE,38*MODEL_SCALE)))
+wing=body.common(Part.makeBox(35*MODEL_SCALE,96*MODEL_SCALE,11*MODEL_SCALE,
+                              A.Vector(-101*MODEL_SCALE,-48*MODEL_SCALE,41*MODEL_SCALE)))
 wing_mesh=MeshPart.meshFromShape(Shape=wing,LinearDeflection=.01,AngularDeflection=.08,Relative=False)
 assert abs(wing_mesh.BoundBox.ZMax-report['rear_spoiler']['top_z_mm'])<.05
 wing_contact=wing.common(Part.makeBox(220*MODEL_SCALE,.2,80*MODEL_SCALE,
@@ -88,5 +106,9 @@ print('Saved CAD: 3 valid solids with GUI state. STL and 3MF are closed. Two ful
 print('Stationary nose contact on the print bed: {:.1f} mm2.'.format(contact))
 print('Rear body contact near the wheel: {:.1f} mm2.'.format(rear_contact))
 print('Two occupant reference envelopes fit; both fixed door grooves are present in the saved CAD.')
+print('All four fenders cover the upper tire tread with clearance; rear cabin transition has no steep step.')
+print('Fair main skin: no extra longitudinal valleys. All four square bumper corners are removed.')
+print('Tapered end thickness: front {:.2f} mm; rear {:.2f} mm.'.format(
+    end_profiles['front']['terminal_thickness_mm'],end_profiles['rear']['terminal_thickness_mm']))
 print('Roof: {:.1f} mm; rear wing: {:.1f} mm; wing bed contact: {:.1f} mm2.'.format(
     cabin['roof_height_mm'],wing_mesh.BoundBox.ZMax,wing_contact))

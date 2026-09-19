@@ -26,19 +26,23 @@ def make_cabin():
     # This retains a wide roof without an unsupported upright side window.
     stations = [
         # x, lower half-width, roof-edge half-width, crown height
-        (-64, 36, 27, 28), (-55, 47.5, 32, 34), (-46, 47.5, 33, 43),
-        (-38, 47.5, 34, 51.5), (-30, 47.5, 34, 53.5),
+        # Extend the fastback onto the rear deck. The eased heights remove the
+        # old short, steep drop behind the seats and bury the terminal cap.
+        (-94, 36, 27, 26), (-86, 47.5, 30, 29), (-80, 47.5, 31, 30.4),
+        (-74, 47.5, 32, 31.3), (-68, 47.5, 33, 33.5),
+        (-60, 47.5, 33.5, 38.7), (-52, 47.5, 34, 45),
+        (-44, 47.5, 34, 50.3), (-38, 47.5, 34, 52.4), (-30, 47.5, 34, 53.5),
         (-18, 47.5, 34, 53.95), (-7, 47.5, 34, 54), (5, 47.5, 34, 53.5),
         (15, 47.5, 33, 51.5), (27, 47.5, 32, 45), (38, 46, 31, 37),
         (48, 38, 28, 29),
     ]
     wires = []
     for x, lower, upper, top in stations:
-        rise = min(3.0, (top - 26) / 3)
+        rise = max(.3, min(3.0, (top - 26) / 3))
         left = V(x, -upper, top - rise)
         right = V(x, upper, top - rise)
         shoulder_z = top-rise-(lower-upper)
-        base_z = min(20, shoulder_z-1)
+        base_z = 5
         wires.append(Part.Wire([
             Part.makeLine(V(x, -lower, base_z), V(x, -lower, shoulder_z)),
             Part.makeLine(V(x, -lower, shoulder_z), left),
@@ -84,7 +88,7 @@ def make_wing():
     return blade
 
 
-def detail_body(body):
+def detail_body(body, glazing_envelope=None):
     skin = body.copy()
     glass_floors = []
     detail_floors = []
@@ -98,6 +102,9 @@ def detail_body(body):
         shifted.translate(V(*inward))
         floor = shifted.common(footprint)
         removed = skin.common(footprint).cut(shifted)
+        if glass and glazing_envelope is not None:
+            # Raised fenders must not inherit stray triangular window patches.
+            removed = removed.common(glazing_envelope)
         assert removed.Volume > .1, (name, removed.Volume)
         body = body.cut(removed).removeSplitter()
         assert body.isValid() and len(body.Solids) == 1, name
@@ -162,11 +169,23 @@ def detail_body(body):
 def face_groups(body, glass_floors, detail_floors):
     print('Classifying recessed faces', flush=True)
     groups = {'glass': [], 'details': []}
+    floor_groups = [('glass', [(floor, floor.BoundBox) for floor in glass_floors]),
+                    ('details', [(floor, floor.BoundBox) for floor in detail_floors])]
     for index, face in enumerate(body.Faces):
-        u, v = face.Surface.parameter(face.CenterOfMass)
+        # The centre of mass of a ring-shaped groove lies outside the groove.
+        # Sample its largest trimmed triangle, then project onto the CAD surface.
+        vertices, triangles = face.tessellate(.08)
+        triangle = max(triangles, key=lambda t:
+                       (vertices[t[1]]-vertices[t[0]]).cross(vertices[t[2]]-vertices[t[0]]).Length)
+        centroid = sum((vertices[i] for i in triangle), V())/3
+        u, v = face.Surface.parameter(centroid)
         sample = Part.Vertex(face.valueAt(u, v))
-        for name, floors in [('glass', glass_floors), ('details', detail_floors)]:
-            if any(floor.distToShape(sample)[0] < .005 for floor in floors):
+        for name, floors in floor_groups:
+            p = sample.Point
+            if any(bounds.XMin-.005 <= p.x <= bounds.XMax+.005
+                   and bounds.YMin-.005 <= p.y <= bounds.YMax+.005
+                   and bounds.ZMin-.005 <= p.z <= bounds.ZMax+.005
+                   and floor.distToShape(sample)[0] < .005 for floor, bounds in floors):
                 groups[name].append(index)
                 break
     assert len(groups['glass']) >= 4, groups
@@ -236,3 +255,57 @@ def check_cabin_surface(body, scale=1.0):
             'roof_lateral_sample_y_mm': [y*scale for y in (0, 10, 20, 30, 35)],
             'upper_glazing_width_mm': widths[1], 'side_glass_lean_from_vertical_deg': lean,
             'side_window_sill_above_print_bed_mm': sill_bed_height}
+
+
+def check_fender_coverage(body, scale=1.0):
+    """Measure radial shell thickness above each tire across its tread width."""
+    checks = []
+    for axle, x in [('rear', -63), ('front', 63)]:
+        for sign, side in [(-1, 'left'), (1, 'right')]:
+            thicknesses = []
+            clearances = []
+            for y in (34, 40, 46.99):
+                centre = V(x*scale, sign*y*scale, 18*scale)
+                for angle in range(30, 151, 15):
+                    direction = V(math.cos(math.radians(angle)), 0,
+                                  math.sin(math.radians(angle)))
+                    ray = Part.makeLine(centre+direction*(18*scale),
+                                        centre+direction*(31*scale))
+                    intervals = body.common(ray).Edges
+                    assert intervals, (axle, side, y, angle, 'uncovered tire')
+                    radii = sorted(sorted((v.Point-centre).dot(direction)
+                                          for v in edge.Vertexes) for edge in intervals)
+                    inner, outer = radii[0][0], radii[0][-1]
+                    clearances.append(inner-18*scale)
+                    thicknesses.append(outer-inner)
+            assert min(clearances) >= 1.49*scale, (axle, side, clearances)
+            assert min(thicknesses) >= 2*scale, (axle, side, thicknesses)
+            checks.append({'axle': axle, 'side': side,
+                           'min_sampled_shell_thickness_mm': min(thicknesses),
+                           'min_sampled_tire_gap_mm': min(clearances)})
+    return {'covered_upper_arc_deg': [30, 150],
+            'sampled_tread_y_mm': [value*scale for value in (34, 40, 46.99)],
+            'checks': checks}
+
+
+def check_rear_transition(body, scale=1.0):
+    """Sample the actual rear deck/roof, excluding the separate wing above it."""
+    sections = []
+    for y in (0, -18, 18):
+        xs = list(range(-78, -31))
+        heights = []
+        for x in xs:
+            ray = Part.makeLine(V(x*scale, y*scale, 25*scale),
+                                V(x*scale, y*scale, 55*scale))
+            edges = body.common(ray).Edges
+            assert edges, (x, y, 'rear surface missing')
+            heights.append(min(edge.BoundBox.ZMax for edge in edges))
+        slopes = [(b-a)/scale for a, b in zip(heights, heights[1:])]
+        # A former near-vertical drop exceeded a 1:1 longitudinal slope.
+        # Small glazing recesses are included in the measured contour.
+        assert max(abs(value) for value in slopes) < 1.05, (y, slopes)
+        sections.append({'section_y_mm': y*scale,
+                         'max_sampled_slope_deg': math.degrees(math.atan(max(map(abs, slopes)))),
+                         'height_samples_mm': heights[::4]})
+    return {'sample_x_range_mm': [-78*scale, -32*scale],
+            'sample_spacing_mm': scale, 'sections': sections}

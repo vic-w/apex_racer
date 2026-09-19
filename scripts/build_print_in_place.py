@@ -2,7 +2,8 @@ from pathlib import Path
 import runpy,json,math
 import FreeCAD as A
 import Part,MeshPart
-from sports_coupe import MODEL_SCALE,ROOF_HEIGHT,make_cabin,make_wing,detail_body,face_groups,check_packaging,check_cabin_surface
+from body_surface import make_body,rounded_planform,end_underside_cutters,check_fairness,check_corners,check_end_profiles
+from sports_coupe import MODEL_SCALE,ROOF_HEIGHT,make_cabin,make_wing,detail_body,face_groups,check_packaging,check_cabin_surface,check_fender_coverage,check_rear_transition
 ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'print_in_place'
 g=runpy.run_path(str(ROOT/'scripts/build_racer.py'))
 V=A.Vector;cyl=g['cyl'];box=g['box'];poly=g['polygon']
@@ -13,76 +14,38 @@ TIRE_START=33.5
 TIRE_FACE=47.0
 def yz_prism(points,x=-110,length=220):
     return Part.Face(poly([(x,y,z) for y,z in points])).extrude(V(length,0,0))
-def roof_limit(apex,crown=10):
-    shoulder=apex-(65-crown)
-    return yz_prism([(-65,-5),(-65,shoulder),(-crown,apex),
-                     (crown,apex),(65,shoulder),(65,-5)])
 canopy=make_cabin()
-# Shared longitudinal loft eliminates the old hood/sidepod/front splice faces.
-# Every section closes on z=5, producing one planar chassis underside.
-def front_section(x, points):
-    curve=Part.BSplineCurve()
-    curve.interpolate([V(x,y,z) for y,z in points])
-    return Part.Wire([curve.toShape(),
-                      Part.makeLine(V(x,points[-1][0],points[-1][1]),
-                                    V(x,points[0][0],points[0][1]))])
-body_stations=[
-    # x, half-width, outer-wall height, fender crest, central deck height
-    # Keep the rear quarter broad at the print plane near the rear wheel.
-    (-99,48,15,29,26),(-90,48,20,34,29),(-75,48,24,38,30),
-    (-55,47,25,36,30),(-30,47,25,33,30),(0,47,25,33,31),
-    (25,47,25,34,33),(45,47,25,36,34),(63,47,24,38,34),
-    # Oversize the cheeks before trimming to the +/-47 mm print planes.
-    (76,48,22,36,33),(86,48,20,32,30.5),(95,48,17,27,26.5),
-    (100.5,36,13,22.5,21.5),
-]
-body_sections=[]
-for x,w,wall,crest,deck in body_stations:
-    half=[(-w,5),(-w,wall),(-.90*w,wall+4),(-.76*w,crest-5),
-          (-.59*w,crest),(-.38*w,deck+.6)]
-    points=half+[(0,deck)]+[(-y,z) for y,z in reversed(half)]
-    body_sections.append(front_section(x,points))
-body_shell=Part.makeLoft(body_sections,True,False,False,3).removeSplitter()
-assert body_shell.isValid() and len(body_shell.Solids)==1
-shell_surface_report={'construction':'single longitudinal smooth loft',
+body_shell,surface=make_body()
+surface_fairness=check_fairness(surface,MODEL_SCALE)
+glazing_envelope=canopy.cut(body_shell)
+shell_surface_report={'construction':'fair cubic B-spline control net with rounded planform',
                       'untrimmed_faces':len(body_shell.Faces),
                       'planar_underside_z_mm':5,
                       'separate_hood_or_nose_fusions':0}
-# Trim only the sides; coincident end caps make the widened loft boolean fragile.
-fixed=body_shell.common(box(-110,-47,0,220,94,80)).common(roof_limit(74))
-fixed=fixed.fuse(canopy).common(box(-110,-47,0,220,94,80)).removeSplitter()
+fixed=body_shell.fuse(canopy).common(rounded_planform()).removeSplitter()
+fixed=fixed.cut(end_underside_cutters()).removeSplitter()
+assert fixed.isValid() and len(fixed.Solids)==1 and fixed.Volume>400000
 
-# Front details share one horizontal datum so the fascia reads as a single
-# assembly instead of a collection of unrelated holes.
+# Slim lamp strips and a single intake fit the lowered nose. End chamfers
+# close the recesses gradually in the side-down print direction.
 def front_recess(points, x=95.5, depth=6.0):
     return yz_prism(points, x, depth)
 
 for sign in (-1, 1):
     # Thin swept lamp pocket on the upper bumper.
-    lamp=[(sign*10.0,23.4),(sign*14.0,26.2),(sign*26.0,27.1),
-          (sign*30.0,25.4),(sign*25.0,23.7),(sign*14.0,22.9)]
+    lamp=[(sign*10.0,15.2),(sign*11.1,16.3),(sign*29.9,16.3),
+          (sign*31.0,15.2),(sign*29.9,14.1),(sign*11.1,14.1)]
     fixed=fixed.cut(front_recess(lamp,96.5,4.5))
 
     # Diamond ducts close at 45 degrees in the side-down print direction.
-    duct=[(sign*20.0,12.85),(sign*24.5,8.35),(sign*29.0,12.85),
-          (sign*24.5,17.35)]
+    duct=[(sign*22.2,11.5),(sign*25.0,8.7),(sign*27.8,11.5),
+          (sign*25.0,14.3)]
     fixed=fixed.cut(front_recess(duct,96.0,4.5))
 
-# A shaped splitter follows the bumper plan and stops short of the tire faces.
-splitter_outline=[(100.5,-17,5.8),(100.5,17,5.8),(98,25,5.8),
-                  (91,30,5.8),(88,26,5.8),(90,-26,5.8),
-                  (91,-30,5.8),(98,-25,5.8)]
-splitter=Part.Face(poly(splitter_outline)).extrude(V(0,0,1.8)).removeSplitter()
-if splitter.isValid() and len(splitter.Solids)==1:
-    fixed=fixed.fuse(splitter).removeSplitter()
-
-# Two recessed grille tiers retain a solid bumper beam between them.
-lower_grille=[(-17.8,7.4),(-20.0,9.6),(-17.8,11.8),
-              (17.8,11.8),(20.0,9.6),(17.8,7.4)]
-upper_grille=[(-15.15,13.1),(-17.0,14.95),(-15.15,16.8),
-              (15.15,16.8),(17.0,14.95),(15.15,13.1)]
-fixed=fixed.cut(front_recess(lower_grille,96.5,4.0))
-fixed=fixed.cut(front_recess(upper_grille,96.5,4.0))
+# One wide opening leaves solid material above the rising lower lip.
+grille=[(-18.7,10.0),(-20.0,11.3),(-18.7,12.6),
+        (18.7,12.6),(20.0,11.3),(18.7,10.0)]
+fixed=fixed.cut(front_recess(grille,96.5,4.0))
 
 fixed = fixed.removeSplitter()
 assert fixed.isValid() and len(fixed.Solids)==1,('body',len(fixed.Solids))
@@ -105,7 +68,7 @@ for sign in (-1,1):
              (sign*top_y+plate_half,top_z),(sign*top_y-plate_half,top_z)]
     fixed=fixed.fuse(yz_prism(section,-90,12))
 fixed=fixed.fuse(wing).removeSplitter()
-fixed,glass_floors,detail_floors,body_details,pillars=detail_body(fixed)
+fixed,glass_floors,detail_floors,body_details,pillars=detail_body(fixed,glazing_envelope)
 paint=face_groups(fixed,glass_floors,detail_floors)
 packaging=check_packaging(fixed)
 assert fixed.isValid() and len(fixed.Solids)==1,('body',len(fixed.Solids))
@@ -155,7 +118,13 @@ A.closeDocument(g['doc'].Name)
 def scale_shape(shape):
     matrix=A.Matrix()
     matrix.A11=MODEL_SCALE;matrix.A22=MODEL_SCALE;matrix.A33=MODEL_SCALE
-    return shape.transformGeometry(matrix)
+    # Uniform scaling preserves analytic surfaces and their shared edges.
+    # transformGeometry unnecessarily refits them and can invalidate the small
+    # bumper details where they meet the curved underside.
+    result=shape.copy()
+    result.transformShape(matrix,True)
+    assert result.isValid() and len(result.Solids)==1
+    return result
 
 fixed=scale_shape(fixed)
 axles=[(name,scale_shape(shape)) for name,shape in axles]
@@ -170,8 +139,9 @@ nose_bed_faces=[f for f in fixed_nose.Faces
 nose_contact_area=sum(f.Area for f in nose_bed_faces)
 nose_first_layer=fixed_nose.common(box(80*MODEL_SCALE,-TIRE_FACE_OUT,0,
                                        25*MODEL_SCALE,.2,70*MODEL_SCALE))
-wing_region=fixed.common(box(-101*MODEL_SCALE,-48*MODEL_SCALE,38*MODEL_SCALE,
-                             35*MODEL_SCALE,96*MODEL_SCALE,14*MODEL_SCALE))
+# Above the widened fender lip, so the contact measurement isolates the wing.
+wing_region=fixed.common(box(-101*MODEL_SCALE,-48*MODEL_SCALE,41*MODEL_SCALE,
+                             35*MODEL_SCALE,96*MODEL_SCALE,11*MODEL_SCALE))
 wing_bed_contact=wing_region.common(box(-110*MODEL_SCALE,-TIRE_FACE_OUT,0,
                                         220*MODEL_SCALE,.2,80*MODEL_SCALE)).Volume/.2
 wing_planar_contact=sum(f.Area for f in wing_region.Faces
@@ -187,6 +157,12 @@ rear_body_contact_area=sum(f.Area for f in rear_bed_faces)
 assert rear_body_contact_area>25,('rear_body_contact_mm2',rear_body_contact_area)
 packaging=check_packaging(fixed,MODEL_SCALE)
 cabin_surface=check_cabin_surface(fixed,MODEL_SCALE)
+print('Checking all four fender covers',flush=True)
+fender_coverage=check_fender_coverage(fixed,MODEL_SCALE)
+print('Checking rear cabin transition',flush=True)
+rear_transition=check_rear_transition(fixed,MODEL_SCALE)
+corner_checks=check_corners(fixed,MODEL_SCALE)
+end_profiles=check_end_profiles(fixed,MODEL_SCALE)
 bed_contact_report={'body_region_x_mm':[80*MODEL_SCALE,100.5*MODEL_SCALE],
                     'bed_plane_y_mm':-TIRE_FACE_OUT,
                     'nose_planar_contact_mm2':nose_contact_area,
@@ -197,9 +173,22 @@ bed_contact_report={'body_region_x_mm':[80*MODEL_SCALE,100.5*MODEL_SCALE],
                     'permanent_widened_bumper':True,'permanent_widened_rear':True}
 doc=A.newDocument('ApexSportsCoupe')
 scene={'meshes':{},'instances':[],'version':'dumbbell-axles','print_in_place':True,'dumbbell_axles':True}
-def mesh_entry(target,name,shape,color):
+def mesh_entry(target,name,shape,color,display_normals=False):
     m=MeshPart.meshFromShape(Shape=shape,LinearDeflection=.025,AngularDeflection=.08,Relative=False)
     pts,tri=m.Topology;target['meshes'][name]={'vertices':[[p.x/1000,p.y/1000,p.z/1000] for p in pts],'triangles':tri}
+    if display_normals:
+        # Preserve real CAD tangents and sharp feature boundaries in the preview.
+        # Averaging normals across unrelated faces made flat panels look dented.
+        vertices=[];triangles=[];normals=[]
+        for face in shape.Faces:
+            fm=MeshPart.meshFromShape(Shape=face,LinearDeflection=.025,AngularDeflection=.08,Relative=False)
+            fp,ft=fm.Topology;offset=len(vertices)
+            vertices.extend([[p.x/1000,p.y/1000,p.z/1000] for p in fp])
+            triangles.extend([[i+offset for i in t] for t in ft])
+            for p in fp:
+                normal=face.normalAt(*face.Surface.parameter(p))
+                normals.append([normal.x,normal.y,normal.z])
+        target['meshes'][name]={'vertices':vertices,'triangles':triangles,'normals':normals}
     target['instances'].append({'name':name,'mesh':name,'color':color,'pose':{'xyz_mm':[0,0,0],'quaternion_xyzw':[0,0,0,1]}})
     return m
 parts=[('IntegratedBody',fixed)]+axles;overhang=[]
@@ -241,9 +230,9 @@ for name,s in parts:
 scene['instances']=[i for i in scene['instances'] if i['name']!='IntegratedBody']
 del scene['meshes']['IntegratedBody']
 accent=set(paint['glass']+paint['details'])
-mesh_entry(scene,'BodyPaint',Part.makeCompound([f for i,f in enumerate(fixed.Faces) if i not in accent]),(.72,.035,.055))
-mesh_entry(scene,'GlassRecesses',Part.makeCompound([fixed.Faces[i] for i in paint['glass']]),(.075,.14,.18))
-mesh_entry(scene,'DoorDetails',Part.makeCompound([fixed.Faces[i] for i in paint['details']]),(.16,.025,.035))
+mesh_entry(scene,'BodyPaint',Part.makeCompound([f for i,f in enumerate(fixed.Faces) if i not in accent]),(.72,.035,.055),True)
+mesh_entry(scene,'GlassRecesses',Part.makeCompound([fixed.Faces[i] for i in paint['glass']]),(.075,.14,.18),True)
+mesh_entry(scene,'DoorDetails',Part.makeCompound([fixed.Faces[i] for i in paint['details']]),(.16,.025,.035),True)
 doc.recompute();doc.saveAs(str(ROOT/'apex_racer.FCStd'));Part.export(doc.Objects,str(ROOT/'apex_racer.step'))
 (ROOT/'scene.json').write_text(json.dumps(scene,separators=(',',':')))
 compound=Part.makeCompound([s for _,s in parts]);printshape=compound.copy()
@@ -290,6 +279,11 @@ report['body_surfaces']={'construction':shell_surface_report['construction'],
                          'untrimmed_faces':shell_surface_report['untrimmed_faces'],
                          'planar_underside_z_mm':shell_surface_report['planar_underside_z_mm']*MODEL_SCALE,
                          'separate_hood_or_nose_fusions':shell_surface_report['separate_hood_or_nose_fusions']}
+report['fender_coverage']=fender_coverage
+report['body_surface_fairness']=surface_fairness
+report['rounded_corners']=corner_checks
+report['end_profiles']=end_profiles
+report['rear_cabin_transition']=rear_transition
 report['bed_contact']=bed_contact_report
 report['cabin']={'layout':'two-seat road coupe','roof_height_mm':ROOF_HEIGHT*MODEL_SCALE,
                  'surface_measurements':cabin_surface,

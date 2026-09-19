@@ -35,19 +35,19 @@
     "support_count": 2,
     "support_normal_thickness_mm": 1.2,
     "support_lean_deg": 45,
-    "planar_contact_mm2": 45.80999999999997,
-    "first_layer_mean_area_mm2": 45.81000000000005
+    "planar_contact_mm2": 45.80999999999999,
+    "first_layer_mean_area_mm2": 45.81000000000019
   },
   "wheel_360_sweep_checks": [
     {
       "axle": "RearDumbbellAxle",
       "conservative_envelope_overlap_mm3": 0.0,
-      "min_clearance_mm": 0.5999999999999864
+      "min_clearance_mm": 0.5999999999999973
     },
     {
       "axle": "FrontDumbbellAxle",
       "conservative_envelope_overlap_mm3": 0.0,
-      "min_clearance_mm": 0.5999999999999894
+      "min_clearance_mm": 0.5999999999999973
     }
   ],
   "all_shapes_valid": true,
@@ -56,10 +56,22 @@
   "overhang_audit": [
     {
       "part": "IntegratedBody",
-      "surface_area_mm2": 23487.591570272423,
-      "steeper_than_45_downward_area_mm2": 83.26234498028194,
-      "cad_confirmed_steeper_than_45_area_mm2": 79.29160727156825,
+      "surface_area_mm2": 24610.63033979704,
+      "steeper_than_45_downward_area_mm2": 77.73740549429826,
+      "cad_confirmed_steeper_than_45_area_mm2": 74.58704029870826,
       "largest_facets": [
+        [
+          -7.51,
+          -27.72,
+          21.09,
+          10.37
+        ],
+        [
+          5.26,
+          -27.72,
+          20.91,
+          10.27
+        ],
         [
           -6.55,
           -27.72,
@@ -71,18 +83,6 @@
           -27.72,
           6.99,
           8.69
-        ],
-        [
-          -10.96,
-          -27.72,
-          21.09,
-          7.58
-        ],
-        [
-          -0.94,
-          -27.72,
-          20.81,
-          3.61
         ],
         [
           -20.49,
@@ -97,16 +97,16 @@
           2.5
         ],
         [
-          -1.25,
+          20.49,
           -27.72,
-          20.95,
-          2.16
+          13.65,
+          2.27
         ],
         [
-          -1.48,
+          20.31,
           -27.72,
-          21.04,
-          2.08
+          16.4,
+          2.19
         ],
         [
           -14.06,
@@ -127,7 +127,7 @@
           1.8
         ],
         [
-          -14.06,
+          -12.22,
           -27.48,
           17.84,
           1.76
@@ -136,24 +136,300 @@
     },
     {
       "part": "RearDumbbellAxle",
-      "surface_area_mm2": 3394.834745955448,
+      "surface_area_mm2": 3394.680560125241,
       "steeper_than_45_downward_area_mm2": 0,
       "cad_confirmed_steeper_than_45_area_mm2": 0,
       "largest_facets": []
     },
     {
       "part": "FrontDumbbellAxle",
-      "surface_area_mm2": 3394.834757079074,
+      "surface_area_mm2": 3394.68056131623,
       "steeper_than_45_downward_area_mm2": 0,
       "cad_confirmed_steeper_than_45_area_mm2": 0,
       "largest_facets": []
     }
   ],
   "body_surfaces": {
-    "construction": "single longitudinal smooth loft",
-    "untrimmed_faces": 4,
+    "construction": "fair cubic B-spline control net with rounded planform",
+    "untrimmed_faces": 6,
     "planar_underside_z_mm": 3.0,
     "separate_hood_or_nose_fusions": 0
+  },
+  "fender_coverage": {
+    "covered_upper_arc_deg": [
+      30,
+      150
+    ],
+    "sampled_tread_y_mm": [
+      20.4,
+      24.0,
+      28.194
+    ],
+    "checks": [
+      {
+        "axle": "rear",
+        "side": "left",
+        "min_sampled_shell_thickness_mm": 1.7816848102371203,
+        "min_sampled_tire_gap_mm": 0.899999999999979
+      },
+      {
+        "axle": "rear",
+        "side": "right",
+        "min_sampled_shell_thickness_mm": 1.7816848102371239,
+        "min_sampled_tire_gap_mm": 0.899999999999979
+      },
+      {
+        "axle": "front",
+        "side": "left",
+        "min_sampled_shell_thickness_mm": 2.0611069295602213,
+        "min_sampled_tire_gap_mm": 0.899999999999979
+      },
+      {
+        "axle": "front",
+        "side": "right",
+        "min_sampled_shell_thickness_mm": 2.061106929560218,
+        "min_sampled_tire_gap_mm": 0.899999999999979
+      }
+    ]
+  },
+  "body_surface_fairness": {
+    "interior_continuity_order": 2,
+    "max_bonnet_to_fender_height_difference_mm": 2.124447999999994,
+    "longitudinal_sections": [
+      {
+        "region": "rear",
+        "surface_v": 0.1,
+        "peaks": 1,
+        "valleys": 0
+      },
+      {
+        "region": "bonnet",
+        "surface_v": 0.1,
+        "peaks": 1,
+        "valleys": 0
+      },
+      {
+        "region": "rear",
+        "surface_v": 1,
+        "peaks": 1,
+        "valleys": 0
+      },
+      {
+        "region": "bonnet",
+        "surface_v": 1,
+        "peaks": 1,
+        "valleys": 0
+      },
+      {
+        "region": "rear",
+        "surface_v": 2,
+        "peaks": 1,
+        "valleys": 0
+      },
+      {
+        "region": "bonnet",
+        "surface_v": 2,
+        "peaks": 1,
+        "valleys": 0
+      },
+      {
+        "region": "rear",
+        "surface_v": 3,
+        "peaks": 1,
+        "valleys": 0
+      },
+      {
+        "region": "bonnet",
+        "surface_v": 3,
+        "peaks": 1,
+        "valleys": 0
+      },
+      {
+        "region": "rear",
+        "surface_v": 4,
+        "peaks": 1,
+        "valleys": 0
+      },
+      {
+        "region": "bonnet",
+        "surface_v": 4,
+        "peaks": 1,
+        "valleys": 0
+      },
+      {
+        "region": "rear",
+        "surface_v": 5,
+        "peaks": 1,
+        "valleys": 0
+      },
+      {
+        "region": "bonnet",
+        "surface_v": 5,
+        "peaks": 1,
+        "valleys": 0
+      },
+      {
+        "region": "rear",
+        "surface_v": 5.9,
+        "peaks": 1,
+        "valleys": 0
+      },
+      {
+        "region": "bonnet",
+        "surface_v": 5.9,
+        "peaks": 1,
+        "valleys": 0
+      }
+    ]
+  },
+  "rounded_corners": {
+    "longitudinal_setback_mm": 7.199999999999999,
+    "lateral_curve_span_mm": 14.399999999999999,
+    "checks": [
+      {
+        "end": "front",
+        "side": "left",
+        "square_corner_removed": true
+      },
+      {
+        "end": "front",
+        "side": "right",
+        "square_corner_removed": true
+      },
+      {
+        "end": "rear",
+        "side": "left",
+        "square_corner_removed": true
+      },
+      {
+        "end": "rear",
+        "side": "right",
+        "square_corner_removed": true
+      }
+    ]
+  },
+  "end_profiles": {
+    "front": {
+      "centreline_sections": [
+        {
+          "x_mm": 51.0,
+          "top_z_mm": 20.10218450138308,
+          "underside_z_mm": 3.0,
+          "thickness_mm": 17.10218450138308
+        },
+        {
+          "x_mm": 54.0,
+          "top_z_mm": 18.247863162803505,
+          "underside_z_mm": 3.013610586011342,
+          "thickness_mm": 15.234252576792162
+        },
+        {
+          "x_mm": 57.0,
+          "top_z_mm": 15.729598542550937,
+          "underside_z_mm": 3.489981096408317,
+          "thickness_mm": 12.23961744614262
+        },
+        {
+          "x_mm": 60.294,
+          "top_z_mm": 10.65780030491834,
+          "underside_z_mm": 4.796870926275993,
+          "thickness_mm": 5.860929378642346
+        }
+      ],
+      "terminal_thickness_mm": 5.860929378642346
+    },
+    "rear": {
+      "centreline_sections": [
+        {
+          "x_mm": -51.0,
+          "top_z_mm": 20.554994515604832,
+          "underside_z_mm": 3.0,
+          "thickness_mm": 17.554994515604832
+        },
+        {
+          "x_mm": -54.0,
+          "top_z_mm": 18.86112503827413,
+          "underside_z_mm": 3.079338842975207,
+          "thickness_mm": 15.78178619529892
+        },
+        {
+          "x_mm": -57.0,
+          "top_z_mm": 16.26381813368217,
+          "underside_z_mm": 3.971900826446281,
+          "thickness_mm": 12.291917307235892
+        },
+        {
+          "x_mm": -59.39399999999999,
+          "top_z_mm": 11.614105384254088,
+          "underside_z_mm": 5.395638347107431,
+          "thickness_mm": 6.218467037146658
+        }
+      ],
+      "terminal_thickness_mm": 6.218467037146658
+    }
+  },
+  "rear_cabin_transition": {
+    "sample_x_range_mm": [
+      -46.8,
+      -19.2
+    ],
+    "sample_spacing_mm": 0.6,
+    "sections": [
+      {
+        "section_y_mm": 0.0,
+        "max_sampled_slope_deg": 43.38991668686609,
+        "height_samples_mm": [
+          21.858913225080034,
+          22.2080856381572,
+          22.36087192350768,
+          22.375710118805884,
+          22.320983598852226,
+          23.762301753396944,
+          25.65006057159546,
+          27.563309187466494,
+          29.253824467852713,
+          30.698082960198008,
+          31.43999999995908,
+          31.870884080267626
+        ]
+      },
+      {
+        "section_y_mm": -10.799999999999999,
+        "max_sampled_slope_deg": 40.47466343963524,
+        "height_samples_mm": [
+          22.152770848394674,
+          22.532500896424512,
+          22.70535387030737,
+          22.731438556429275,
+          22.66016589773638,
+          23.246072322154156,
+          25.14360729346241,
+          27.062425219237873,
+          28.75277650751628,
+          30.196279876419943,
+          30.93831895350883,
+          31.36925357576697
+        ]
+      },
+      {
+        "section_y_mm": 10.799999999999999,
+        "max_sampled_slope_deg": 40.474663439635634,
+        "height_samples_mm": [
+          22.152770848394674,
+          22.532500896424512,
+          22.70535387030737,
+          22.73143855642927,
+          22.660165897736384,
+          23.246072322154184,
+          25.14360729346242,
+          27.06242521923788,
+          28.752776507516288,
+          30.196279876419958,
+          30.93831895350884,
+          31.369253575766983
+        ]
+      }
+    ]
   },
   "bed_contact": {
     "body_region_x_mm": [
@@ -161,10 +437,10 @@
       60.3
     ],
     "bed_plane_y_mm": -28.2,
-    "nose_planar_contact_mm2": 93.57987676010495,
+    "nose_planar_contact_mm2": 83.94601108331167,
     "first_layer_height_mm": 0.2,
-    "nose_first_layer_mean_area_mm2": 94.93469974106684,
-    "rear_body_planar_contact_mm2": 97.51235550453802,
+    "nose_first_layer_mean_area_mm2": 85.63250722070575,
+    "rear_body_planar_contact_mm2": 68.99305251712262,
     "rear_contact_region_x_mm": [
       -60.599999999999994,
       -48.0
@@ -178,11 +454,11 @@
     "surface_measurements": {
       "section_x_mm": -4.2,
       "roof_height_samples_mm": [
-        32.39999999995908,
-        32.24539096996701,
-        31.78032619941901,
-        31.00104256736744,
-        29.99999999999997
+        32.399999999959114,
+        32.24539096996704,
+        31.780326199419054,
+        31.001042567367485,
+        30.00000000000003
       ],
       "roof_lateral_sample_y_mm": [
         0.0,
@@ -191,40 +467,40 @@
         18.0,
         21.0
       ],
-      "upper_glazing_width_mm": 43.439999999999976,
-      "side_glass_lean_from_vertical_deg": 45.00000000000001,
-      "side_window_sill_above_print_bed_mm": 0.48060000000000613
+      "upper_glazing_width_mm": 43.44000000000008,
+      "side_glass_lean_from_vertical_deg": 44.999999999999986,
+      "side_window_sill_above_print_bed_mm": 0.4805999999999706
     },
     "pillars": [
       {
         "side": "left",
         "pillar": "A",
-        "minimum_window_recess_separation_mm": 0.9764883834388242
+        "minimum_window_recess_separation_mm": 0.9663789457151981
       },
       {
         "side": "left",
         "pillar": "B",
-        "minimum_window_recess_separation_mm": 1.5
+        "minimum_window_recess_separation_mm": 1.5010835503131696
       },
       {
         "side": "left",
         "pillar": "C",
-        "minimum_window_recess_separation_mm": 2.0086546085643673
+        "minimum_window_recess_separation_mm": 3.0027411495105363
       },
       {
         "side": "right",
         "pillar": "A",
-        "minimum_window_recess_separation_mm": 0.9764883827161162
+        "minimum_window_recess_separation_mm": 0.9663789457151949
       },
       {
         "side": "right",
         "pillar": "B",
-        "minimum_window_recess_separation_mm": 1.5
+        "minimum_window_recess_separation_mm": 1.5010835501119106
       },
       {
         "side": "right",
         "pillar": "C",
-        "minimum_window_recess_separation_mm": 2.008654608255184
+        "minimum_window_recess_separation_mm": 3.0027411495105287
       }
     ],
     "fixed_door_count": 2,
@@ -258,57 +534,57 @@
     "details": [
       {
         "name": "left_door_window",
-        "removed_volume_mm3": 108.35228853717051
+        "removed_volume_mm3": 108.30425176249824
       },
       {
         "name": "left_quarter_window",
-        "removed_volume_mm3": 11.40473502071309
+        "removed_volume_mm3": 10.27110606029445
       },
       {
         "name": "right_door_window",
-        "removed_volume_mm3": 108.34826886587241
+        "removed_volume_mm3": 108.30522518976865
       },
       {
         "name": "right_quarter_window",
-        "removed_volume_mm3": 11.404812784955153
+        "removed_volume_mm3": 10.271243178205223
       },
       {
         "name": "windscreen",
-        "removed_volume_mm3": 137.03084912910566
+        "removed_volume_mm3": 134.85698163000578
       },
       {
         "name": "rear_window",
-        "removed_volume_mm3": 137.03038682841833
+        "removed_volume_mm3": 122.48012975139935
       },
       {
         "name": "left_door_seam",
-        "removed_volume_mm3": 26.91016358714859
+        "removed_volume_mm3": 26.91020065278499
       },
       {
         "name": "left_door_handle",
-        "removed_volume_mm3": 6.552576000000021
+        "removed_volume_mm3": 6.552576000000019
       },
       {
         "name": "right_door_seam",
-        "removed_volume_mm3": 26.910163857111097
+        "removed_volume_mm3": 26.910200652785047
       },
       {
         "name": "right_door_handle",
-        "removed_volume_mm3": 6.552576000000021
+        "removed_volume_mm3": 6.552576000000017
       }
     ]
   },
   "print_bounds_mm": [
-    119.74790573120117,
-    32.39487508346792,
-    56.40000152587892
+    119.70000076293945,
+    32.4040121647995,
+    56.40000152587891
   ],
-  "print_bed_z_mm": -1.7763568394002505e-14,
+  "print_bed_z_mm": -7.105427357601002e-15,
   "shaft_diameter_mm": 5.3999999999999995,
   "bore_diameter_mm": 6.6,
   "slicing_check": {
     "slicer": "Bambu Studio 02.02.01.60",
-    "stl_sha256": "e36005881ef3af8e23b43ad09e01e83366317cae0862720d0ca0838de539d906",
+    "stl_sha256": "81ebf25168ff392ceeffc8792cd8233d7de97b1d82cbeba9d7e0b987eca080be",
     "printer": "Bambu Lab A1 mini",
     "nozzle_diameter_mm": 0.4,
     "layer_height_mm": 0.2,
@@ -324,7 +600,7 @@
     "model_outside_build_volume": false,
     "mesh_repairs": [
       {
-        "face_count": "131940",
+        "face_count": "59974",
         "edges_fixed": "0",
         "degenerate_facets": "0",
         "facets_removed": "0",
@@ -332,8 +608,8 @@
         "backwards_edges": "0"
       }
     ],
-    "estimated_seconds": 7997,
-    "estimated_filament_g": 59.55,
+    "estimated_seconds": 8080,
+    "estimated_filament_g": 63.22,
     "limitation": "Successful slicing without support is not a physical print test."
   }
 }
