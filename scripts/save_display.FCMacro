@@ -10,6 +10,11 @@ try:
     for o in doc.Objects:
         if 'DesignColor' in o.PropertiesList:
             o.ViewObject.ShapeColor=tuple(o.DesignColor[:3])
+            if 'GlassFaces' in o.PropertiesList:
+                colours=[tuple(o.DesignColor[:3]) for _ in o.Shape.Faces]
+                for index in o.GlassFaces:colours[index]=(.075,.14,.18)
+                for index in o.DetailFaces:colours[index]=(.16,.025,.035)
+                o.ViewObject.DiffuseColor=colours
             o.ViewObject.LineColor=(.08,.09,.10)
             o.ViewObject.DisplayMode='Flat Lines'
             o.ViewObject.Visibility=True

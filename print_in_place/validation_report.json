@@ -1,142 +1,149 @@
 {
   "mode": "Single print job; two integrated dumbbell axles through chassis bores",
+  "model_scale": 0.6,
+  "a1_mini_bed_fit": true,
+  "target_build_volume_mm": [
+    180,
+    180,
+    180
+  ],
   "rigid_bodies": 3,
   "stl_files_required": 1,
-  "shaft_diameter_mm": 9.0,
-  "bore_diameter_mm": 11.0,
-  "radial_bearing_clearance_mm": 1.0,
-  "tire_arch_radial_clearance_mm": 1.5,
+  "radial_bearing_clearance_mm": 0.6,
+  "tire_arch_radial_clearance_mm": 0.8999999999999999,
   "wheel_face_texture": {
     "ring_count": 2,
     "ring_width_mm": [
-      1.5,
-      2.0
+      0.8999999999999999,
+      1.2
     ],
     "ring_depth_mm": [
-      1.0,
-      1.25
+      0.6,
+      0.75
     ],
     "radial_groove_count": 10,
-    "radial_groove_width_mm": 2.0,
-    "radial_groove_depth_mm": 1.2
+    "radial_groove_width_mm": 1.2,
+    "radial_groove_depth_mm": 0.72
   },
-  "wing_supports": {
-    "count": 2,
-    "normal_thickness_mm": 2,
-    "longitudinal_chord_mm": 16,
-    "lateral_lean_deg": 45
+  "rear_spoiler": {
+    "type": "swept tapered Bezier blade with rising trailing lip and endplates",
+    "top_z_mm": 29.4,
+    "span_mm": 56.4,
+    "trailing_edge_thickness_mm": 0.96,
+    "endplate_thickness_mm": 1.2,
+    "endplate_transition_span_mm": 4.8,
+    "support_count": 2,
+    "support_normal_thickness_mm": 1.2,
+    "support_lean_deg": 45,
+    "planar_contact_mm2": 45.80999999999997,
+    "first_layer_mean_area_mm2": 45.81000000000005
   },
   "wheel_360_sweep_checks": [
     {
       "axle": "RearDumbbellAxle",
       "conservative_envelope_overlap_mm3": 0.0,
-      "min_clearance_mm": 0.9999999999999869
+      "min_clearance_mm": 0.5999999999999864
     },
     {
       "axle": "FrontDumbbellAxle",
       "conservative_envelope_overlap_mm3": 0.0,
-      "min_clearance_mm": 0.9999999999999929
+      "min_clearance_mm": 0.5999999999999894
     }
   ],
   "all_shapes_valid": true,
   "stl_closed": true,
   "physical_print_test": false,
-  "print_bounds_mm": [
-    199.57411193847656,
-    56.99644193588756,
-    94.0
-  ],
   "overhang_audit": [
     {
       "part": "IntegratedBody",
-      "surface_area_mm2": 63150.29877351231,
-      "steeper_than_45_downward_area_mm2": 430.4072203710863,
-      "cad_confirmed_steeper_than_45_area_mm2": 424.60047593039326,
+      "surface_area_mm2": 23487.591570272423,
+      "steeper_than_45_downward_area_mm2": 83.26234498028194,
+      "cad_confirmed_steeper_than_45_area_mm2": 79.29160727156825,
       "largest_facets": [
         [
-          97.5,
-          -21.0,
-          13.5,
-          17.21
+          -6.55,
+          -27.72,
+          6.81,
+          8.75
         ],
         [
-          99.0,
-          -20.5,
-          11.0,
-          17.21
+          4.22,
+          -27.72,
+          6.99,
+          8.69
         ],
         [
-          99.0,
-          28.67,
-          12.4,
-          16.36
+          -10.96,
+          -27.72,
+          21.09,
+          7.58
         ],
         [
-          97.5,
-          28.33,
-          14.8,
-          16.36
+          -0.94,
+          -27.72,
+          20.81,
+          3.61
         ],
         [
-          97.83,
-          18.67,
-          10.87,
-          6.88
+          -20.49,
+          -27.72,
+          17.71,
+          2.59
         ],
         [
-          99.17,
-          19.33,
-          9.93,
-          6.88
+          -20.31,
+          -27.72,
+          14.54,
+          2.5
         ],
         [
-          11.73,
-          -46.76,
-          25.31,
-          6.75
+          -1.25,
+          -27.72,
+          20.95,
+          2.16
         ],
         [
-          0.42,
-          -46.83,
-          25.25,
-          6.28
+          -1.48,
+          -27.72,
+          21.04,
+          2.08
         ],
         [
-          30.88,
-          -46.72,
-          25.44,
-          6.26
+          -14.06,
+          -27.48,
+          16.42,
+          1.94
         ],
         [
-          -23.09,
-          -46.77,
-          25.36,
-          4.91
+          -12.16,
+          -27.48,
+          16.64,
+          1.82
         ],
         [
-          -31.31,
-          -46.79,
-          25.32,
-          4.58
+          18.62,
+          -27.72,
+          9.4,
+          1.8
         ],
         [
-          21.08,
-          -46.83,
-          25.22,
-          4.05
+          -14.06,
+          -27.48,
+          17.84,
+          1.76
         ]
       ]
     },
     {
       "part": "RearDumbbellAxle",
-      "surface_area_mm2": 9429.667992809285,
+      "surface_area_mm2": 3394.834745955448,
       "steeper_than_45_downward_area_mm2": 0,
       "cad_confirmed_steeper_than_45_area_mm2": 0,
       "largest_facets": []
     },
     {
       "part": "FrontDumbbellAxle",
-      "surface_area_mm2": 9429.668035381284,
+      "surface_area_mm2": 3394.834757079074,
       "steeper_than_45_downward_area_mm2": 0,
       "cad_confirmed_steeper_than_45_area_mm2": 0,
       "largest_facets": []
@@ -145,19 +152,188 @@
   "body_surfaces": {
     "construction": "single longitudinal smooth loft",
     "untrimmed_faces": 4,
-    "planar_underside_z_mm": 5,
+    "planar_underside_z_mm": 3.0,
     "separate_hood_or_nose_fusions": 0
   },
   "bed_contact": {
     "body_region_x_mm": [
-      80,
-      100.5
+      48.0,
+      60.3
     ],
-    "bed_plane_y_mm": -47.0,
-    "nose_planar_contact_mm2": 259.74296182450166,
+    "bed_plane_y_mm": -28.2,
+    "nose_planar_contact_mm2": 93.57987676010495,
     "first_layer_height_mm": 0.2,
-    "nose_first_layer_mean_area_mm2": 262.08604839088304,
-    "permanent_widened_bumper": true
+    "nose_first_layer_mean_area_mm2": 94.93469974106684,
+    "rear_body_planar_contact_mm2": 97.51235550453802,
+    "rear_contact_region_x_mm": [
+      -60.599999999999994,
+      -48.0
+    ],
+    "permanent_widened_bumper": true,
+    "permanent_widened_rear": true
   },
-  "print_bed_z_mm": -7.105427357601002e-15
+  "cabin": {
+    "layout": "two-seat road coupe",
+    "roof_height_mm": 32.4,
+    "surface_measurements": {
+      "section_x_mm": -4.2,
+      "roof_height_samples_mm": [
+        32.39999999995908,
+        32.24539096996701,
+        31.78032619941901,
+        31.00104256736744,
+        29.99999999999997
+      ],
+      "roof_lateral_sample_y_mm": [
+        0.0,
+        6.0,
+        12.0,
+        18.0,
+        21.0
+      ],
+      "upper_glazing_width_mm": 43.439999999999976,
+      "side_glass_lean_from_vertical_deg": 45.00000000000001,
+      "side_window_sill_above_print_bed_mm": 0.48060000000000613
+    },
+    "pillars": [
+      {
+        "side": "left",
+        "pillar": "A",
+        "minimum_window_recess_separation_mm": 0.9764883834388242
+      },
+      {
+        "side": "left",
+        "pillar": "B",
+        "minimum_window_recess_separation_mm": 1.5
+      },
+      {
+        "side": "left",
+        "pillar": "C",
+        "minimum_window_recess_separation_mm": 2.0086546085643673
+      },
+      {
+        "side": "right",
+        "pillar": "A",
+        "minimum_window_recess_separation_mm": 0.9764883827161162
+      },
+      {
+        "side": "right",
+        "pillar": "B",
+        "minimum_window_recess_separation_mm": 1.5
+      },
+      {
+        "side": "right",
+        "pillar": "C",
+        "minimum_window_recess_separation_mm": 2.008654608255184
+      }
+    ],
+    "fixed_door_count": 2,
+    "door_panel_length_mm": 40.8,
+    "door_seam_width_mm": 0.54,
+    "door_seam_lateral_depth_mm": 0.48,
+    "window_lateral_recess_mm": 0.48,
+    "interior_modelled": false,
+    "packaging": {
+      "purpose": "concept exterior proportions, not an ergonomic certification",
+      "seat_centres_y_mm": [
+        -9.0,
+        9.0
+      ],
+      "seat_cushion_width_mm": 16.2,
+      "centre_gap_mm": 1.7999999999999998,
+      "seat_cushion_base_z_mm": 8.4,
+      "upper_body_recline_deg": 12,
+      "head_envelope_top_z_mm": 31.016816523510656,
+      "checks": [
+        {
+          "side": "left",
+          "outside_exterior_volume_mm3": 0.0
+        },
+        {
+          "side": "right",
+          "outside_exterior_volume_mm3": 0.0
+        }
+      ]
+    },
+    "details": [
+      {
+        "name": "left_door_window",
+        "removed_volume_mm3": 108.35228853717051
+      },
+      {
+        "name": "left_quarter_window",
+        "removed_volume_mm3": 11.40473502071309
+      },
+      {
+        "name": "right_door_window",
+        "removed_volume_mm3": 108.34826886587241
+      },
+      {
+        "name": "right_quarter_window",
+        "removed_volume_mm3": 11.404812784955153
+      },
+      {
+        "name": "windscreen",
+        "removed_volume_mm3": 137.03084912910566
+      },
+      {
+        "name": "rear_window",
+        "removed_volume_mm3": 137.03038682841833
+      },
+      {
+        "name": "left_door_seam",
+        "removed_volume_mm3": 26.91016358714859
+      },
+      {
+        "name": "left_door_handle",
+        "removed_volume_mm3": 6.552576000000021
+      },
+      {
+        "name": "right_door_seam",
+        "removed_volume_mm3": 26.910163857111097
+      },
+      {
+        "name": "right_door_handle",
+        "removed_volume_mm3": 6.552576000000021
+      }
+    ]
+  },
+  "print_bounds_mm": [
+    119.74790573120117,
+    32.39487508346792,
+    56.40000152587892
+  ],
+  "print_bed_z_mm": -1.7763568394002505e-14,
+  "shaft_diameter_mm": 5.3999999999999995,
+  "bore_diameter_mm": 6.6,
+  "slicing_check": {
+    "slicer": "Bambu Studio 02.02.01.60",
+    "stl_sha256": "e36005881ef3af8e23b43ad09e01e83366317cae0862720d0ca0838de539d906",
+    "printer": "Bambu Lab A1 mini",
+    "nozzle_diameter_mm": 0.4,
+    "layer_height_mm": 0.2,
+    "filament": "Generic PLA",
+    "plate": "Textured PEI Plate",
+    "wall_loops": 3,
+    "infill_percent": 15,
+    "brim_enabled": false,
+    "supports_enabled": false,
+    "support_toolpaths": false,
+    "slicing_succeeded": true,
+    "layer_count": 282,
+    "model_outside_build_volume": false,
+    "mesh_repairs": [
+      {
+        "face_count": "131940",
+        "edges_fixed": "0",
+        "degenerate_facets": "0",
+        "facets_removed": "0",
+        "facets_reversed": "0",
+        "backwards_edges": "0"
+      }
+    ],
+    "estimated_seconds": 7997,
+    "estimated_filament_g": 59.55,
+    "limitation": "Successful slicing without support is not a physical print test."
+  }
 }
